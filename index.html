@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIKELEMBA YETU — Gestion de Tontine</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root, [data-theme="dark"]{
+    --bg:#0b1220;--panel:#141e33;--panel-2:#1c2942;--border:#334361;
+    --text:#f4f7fd;--muted:#b0bed6;--gold:#f7c04a;--gold-2:#d99a12;--on-gold:#1a1205;
+    --green:#4be699;--red:#ff8b80;--shadow:0 25px 70px rgba(0,0,0,.6);
+    --input-bg:#0b1220;--hover:rgba(255,255,255,.08);
+  }
+  [data-theme="light"]{
+    --bg:#eef2f8;--panel:#ffffff;--panel-2:#f4f7fc;--border:#c8d3e3;
+    --text:#0a1424;--muted:#3d4d68;--gold:#8a6408;--gold-2:#6e4f04;--on-gold:#ffffff;
+    --green:#0e6e35;--red:#b91c1c;--shadow:0 20px 55px rgba(20,40,80,.18);
+    --input-bg:#ffffff;--hover:rgba(15,24,40,.06);
+  }
+  html,body{height:100%}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+  .hidden{display:none!important}
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 18% 18%,rgba(245,183,49,.16),transparent 45%),radial-gradient(circle at 82% 82%,rgba(34,197,94,.12),transparent 45%),var(--bg)}
+  .login-card{width:100%;max-width:440px;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);border-radius:22px;padding:46px 34px 30px;text-align:center;box-shadow:var(--shadow)}
+  .logo-badge{width:86px;height:86px;border-radius:24px;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--on-gold);font-weight:800;font-size:30px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;box-shadow:0 10px 34px rgba(245,183,49,.38)}
+  .login-card h1{font-size:24px;letter-spacing:2.8px;font-weight:800}
+  .login-sub{color:var(--muted);font-size:13.5px;margin-top:8px;margin-bottom:32px;letter-spacing:2.2px;text-transform:uppercase}
+  .input-wrap{position:relative}
+  .input-wrap input{padding-right:52px;text-align:center;letter-spacing:2px;font-weight:600;font-size:17px}
+  .input-wrap button{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;padding:8px 10px;border-radius:9px;color:var(--muted)}
+  .input-wrap button:hover{background:var(--hover)}
+  .error{color:var(--red);font-size:14.5px;min-height:22px;margin:8px 0 14px;font-weight:700}
+  .login-foot{color:var(--muted);font-size:13px;margin-top:28px;letter-spacing:.4px}
+  .field{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:18px}
+  .field label{font-size:13.5px;color:var(--muted);font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+  input,select,textarea{width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);padding:14px 16px;border-radius:12px;font-size:16px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+  input::placeholder,textarea::placeholder{color:var(--muted);opacity:.85}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,183,49,.22)}
+  textarea{resize:vertical}
+  select option{background:var(--panel);color:var(--text)}
+  .btn{border:none;cursor:pointer;font-family:inherit;font-size:15.5px;font-weight:800;padding:14px 22px;border-radius:12px;transition:.15s;letter-spacing:.2px;display:inline-flex;align-items:center;gap:9px;justify-content:center}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--on-gold);box-shadow:0 6px 18px rgba(245,183,49,.28)}
+  .btn-gold:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .btn-ghost{background:var(--panel-2);color:var(--text);border:1px solid var(--border)}
+  .btn-ghost:hover{background:var(--hover)}
+  .btn-danger{background:rgba(240,87,74,.14);color:var(--red);border:1px solid rgba(240,87,74,.4)}
+  .btn-danger:hover{background:rgba(240,87,74,.24)}
+  .btn-success{background:rgba(34,197,94,.16);color:var(--green);border:1px solid rgba(34,197,94,.4)}
+  .btn-success:hover{background:rgba(34,197,94,.26)}
+  .btn-block{width:100%}
+  .btn-sm{padding:10px 16px;font-size:14px;border-radius:10px}
+  .icon-btn{background:none;border:none;cursor:pointer;font-size:17px;padding:8px 10px;border-radius:10px;transition:.15s;color:var(--text);line-height:1}
+  .icon-btn:hover{background:var(--hover)}
+  #app{min-height:100vh;display:flex;flex-direction:column}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .topbar{display:flex;align-items:center;gap:14px;padding:20px 28px;border-bottom:1px solid var(--border);background:var(--panel);position:sticky;top:0;z-index:20}
+  .topbar h2{font-size:21px;font-weight:800;letter-spacing:.3px}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+  .topbar-date{color:var(--muted);font-size:14px;text-transform:capitalize;font-weight:600}
+  .theme-toggle{font-size:21px;padding:9px 12px;border:1px solid var(--border);border-radius:11px}
+  .sync-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:20px;font-size:12.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;transition:.2s}
+  .sync-badge .sync-dot{width:9px;height:9px;border-radius:50%;background:currentColor;flex-shrink:0}
+  .sync-badge.local{background:rgba(148,163,184,.16);color:var(--muted)}
+  .sync-badge.syncing{background:rgba(245,183,49,.16);color:var(--gold)}
+  .sync-badge.online{background:rgba(34,197,94,.18);color:var(--green)}
+  .sync-badge.online .sync-dot{animation:pulse 2s infinite}
+  .sync-badge.offline{background:rgba(240,87,74,.18);color:var(--red)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .content{padding:30px 28px 140px;flex:1;max-width:1200px;width:100%;margin:0 auto}
+  .page{display:none}
+  .page.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);display:flex;justify-content:center;gap:4px;padding:10px 8px;z-index:60;box-shadow:0 -6px 26px rgba(0,0,0,.18);overflow-x:auto;scrollbar-width:none}
+  .bottom-nav::-webkit-scrollbar{display:none}
+  .nav-item{flex:1;min-width:0;max-width:150px;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--muted);font-weight:700;padding:10px 6px;border-radius:13px;transition:.15s;white-space:nowrap;overflow:hidden}
+  .nav-item .nav-icon{font-size:23px;line-height:1}
+  .nav-item .nav-label{font-size:12px;letter-spacing:.2px;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .nav-item:hover{background:var(--hover);color:var(--text)}
+  .nav-item.active{background:linear-gradient(160deg,rgba(245,183,49,.24),rgba(245,183,49,.06));color:var(--gold);box-shadow:inset 0 0 0 1.5px rgba(245,183,49,.38)}
+  .nav-item.active .nav-icon{transform:scale(1.06)}
+  .nav-item.logout{color:var(--red);max-width:110px}
+  .nav-item.logout:hover{background:rgba(240,87,74,.14)}
+  .hero{background:radial-gradient(circle at 15% 20%,rgba(245,183,49,.22),transparent 55%),radial-gradient(circle at 85% 80%,rgba(34,197,94,.15),transparent 55%),var(--panel);border:1px solid var(--border);border-radius:24px;padding:56px 30px;text-align:center;margin-bottom:26px;box-shadow:var(--shadow)}
+  .hero-eyebrow{display:inline-block;font-size:13px;letter-spacing:2.6px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:20px;border:1px solid var(--border);padding:9px 20px;border-radius:30px;background:var(--panel-2)}
+  .hero-title{font-size:clamp(34px,6.5vw,58px);font-weight:800;letter-spacing:3px;line-height:1.1;background:linear-gradient(135deg,var(--gold),var(--gold-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--gold);margin-bottom:10px}
+  .hero-sub{font-size:clamp(16px,3.2vw,23px);font-weight:800;letter-spacing:4px;color:var(--text);margin-bottom:22px}
+  .hero-desc{color:var(--muted);font-size:16.5px;max-width:660px;margin:0 auto 32px;line-height:1.75}
+  .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-bottom:26px}
+  .kpi{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;gap:16px;align-items:center;transition:.2s}
+  .kpi:hover{transform:translateY(-2px);border-color:var(--gold)}
+  .kpi-icon{font-size:28px;width:62px;height:62px;border-radius:16px;background:var(--panel-2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .kpi-gold{background:linear-gradient(160deg,rgba(245,183,49,.18),rgba(245,183,49,.03));border-color:rgba(245,183,49,.45)}
+  .kpi-gold .kpi-value{color:var(--gold)}
+  .kpi-label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:800}
+  .kpi-value{font-size:26px;font-weight:800;margin-top:6px;word-break:break-word;letter-spacing:.3px;line-height:1.2}
+  .next-schedule{background:linear-gradient(135deg,rgba(245,183,49,.18),rgba(245,183,49,.03));border:1px solid rgba(245,183,49,.5);border-radius:16px;padding:22px;margin-bottom:22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .next-sched-icon{width:60px;height:60px;border-radius:16px;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--on-gold);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 22px rgba(245,183,49,.35)}
+  .next-sched-main{flex:1;min-width:200px}
+  .next-sched-label{font-size:12.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:800;margin-bottom:5px}
+  .next-sched-name{font-size:21px;font-weight:800;color:var(--gold);line-height:1.2}
+  .next-sched-when{font-size:14.5px;color:var(--text);margin-top:6px;font-weight:600}
+  .next-sched-when strong{color:var(--gold)}
+  .next-sched-empty{background:var(--panel);border:1px dashed var(--border);border-radius:16px;padding:22px;margin-bottom:22px;text-align:center;color:var(--muted);font-size:15.5px}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px}
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+  .card-head h3{font-size:17.5px;font-weight:800}
+  .table-wrap{overflow-x:auto}
+  .table{width:100%;border-collapse:collapse;font-size:15.5px}
+  .table th{text-align:left;padding:14px;color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.9px;border-bottom:1.5px solid var(--border);font-weight:800;white-space:nowrap}
+  .table td{padding:16px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .table tr:last-child td{border-bottom:none}
+  .table tbody tr:hover{background:var(--hover)}
+  .text-right{text-align:right}
+  .pos{color:var(--green);font-weight:800}
+  .neg{color:var(--red);font-weight:800}
+  .empty{text-align:center;color:var(--muted);padding:34px;font-size:15.5px}
+  .muted{color:var(--muted);font-size:15px}
+  .small{font-size:13.5px}
+  .member-cell{display:flex;align-items:center;gap:14px}
+  .avatar{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--on-gold);font-weight:800;font-size:14.5px;text-transform:uppercase;display:flex;align-items:center;justify-content:center}
+  .rank{display:inline-flex;width:28px;height:28px;border-radius:9px;background:var(--panel-2);align-items:center;justify-content:center;font-size:13.5px;font-weight:800;color:var(--muted)}
+  .badge{padding:6px 13px;border-radius:20px;font-size:13px;font-weight:800;letter-spacing:.3px;white-space:nowrap;display:inline-block}
+  .badge.cotisation{background:rgba(34,197,94,.18);color:var(--green)}
+  .badge.amende{background:rgba(245,183,49,.18);color:var(--gold)}
+  .badge.retrait{background:rgba(240,87,74,.18);color:var(--red)}
+  .badge.add{background:rgba(34,197,94,.18);color:var(--green)}
+  .badge.edit{background:rgba(59,130,246,.2);color:#6cb6ff}
+  .badge.del{background:rgba(240,87,74,.18);color:var(--red)}
+  .badge.info{background:rgba(148,163,184,.2);color:var(--muted)}
+  .badge.prevu{background:rgba(245,183,49,.2);color:var(--gold)}
+  .badge.effectue{background:rgba(34,197,94,.2);color:var(--green)}
+  .badge.late{background:rgba(240,87,74,.18);color:var(--red)}
+  .tx-list{display:flex;flex-direction:column;gap:10px;max-height:460px;overflow-y:auto;padding-right:2px}
+  .tx-item{display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--border)}
+  .tx-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:var(--panel)}
+  .tx-icon.cotisation{background:rgba(34,197,94,.18)}
+  .tx-icon.retrait{background:rgba(240,87,74,.18)}
+  .tx-icon.amende{background:rgba(245,183,49,.18)}
+  .tx-main{flex:1;min-width:0}
+  .tx-title{font-weight:700;font-size:15.5px}
+  .tx-sub{font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+  .tx-amount{font-weight:800;font-size:15.5px;white-space:nowrap}
+  .filters{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+  .filters input,.filters select{flex:1;min-width:190px}
+  .schedule-card{display:flex;align-items:center;gap:16px;padding:18px;border-radius:14px;background:var(--panel-2);border:1px solid var(--border);margin-bottom:12px;flex-wrap:wrap;transition:.2s}
+  .schedule-card:hover{border-color:var(--gold)}
+  .schedule-card.done{opacity:.7;border-style:dashed}
+  .schedule-card.done .schedule-date-badge{background:var(--panel);color:var(--muted)}
+  .schedule-card.late{border-color:rgba(240,87,74,.45);background:rgba(240,87,74,.05)}
+  .schedule-card.next{border-color:var(--gold);box-shadow:0 0 0 2px rgba(245,183,49,.2)}
+  .schedule-date-badge{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--on-gold);border-radius:13px;padding:11px 16px;text-align:center;min-width:74px;flex-shrink:0}
+  .sched-day{font-size:24px;font-weight:800;line-height:1}
+  .sched-month{font-size:11.5px;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;margin-top:4px}
+  .schedule-main{flex:1;min-width:200px}
+  .schedule-member{font-size:17px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .schedule-details{font-size:14px;color:var(--muted);line-height:1.7}
+  .schedule-details strong{color:var(--text);font-weight:700}
+  .schedule-note{font-size:13.5px;color:var(--muted);font-style:italic;margin-top:5px}
+  .schedule-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .hist-row{display:flex;align-items:center;gap:14px;padding:15px;border-radius:14px;background:var(--panel-2);border:1px solid var(--border);margin-bottom:10px}
+  .hist-icon{width:44px;height:44px;border-radius:12px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .hist-main{flex:1;min-width:0}
+  .hist-msg{font-size:15.5px;font-weight:700;word-break:break-word;line-height:1.4}
+  .hist-time{font-size:13px;color:var(--muted);margin-top:4px}
+  .modal-overlay{position:fixed;inset:0;background:rgba(3,7,18,.78);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}
+  .modal-overlay.show{display:flex;animation:fade .18s ease}
+  .modal{width:100%;max-width:560px;max-height:90vh;overflow-y:auto;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:var(--shadow);animation:pop .2s ease}
+  @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:10px}
+  .modal-head h3{font-size:19px;font-weight:800}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap}
+  .confirm-msg{color:var(--muted);font-size:15.5px;line-height:1.7}
+  .confirm-msg strong{color:var(--text)}
+  .profile-balance{background:linear-gradient(135deg,rgba(245,183,49,.18),rgba(245,183,49,.03));border:1px solid rgba(245,183,49,.45);border-radius:16px;padding:22px;text-align:center;margin-bottom:22px}
+  .pb-label{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:800}
+  .pb-value{font-size:34px;font-weight:800;margin-top:8px;color:var(--gold);line-height:1.2}
+  .profile-info{display:grid;gap:2px;margin-bottom:24px}
+  .profile-info>div{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);font-size:15.5px}
+  .profile-info span{color:var(--muted)}
+  .mini-title{font-size:13.5px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px;font-weight:800}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .stats>div{background:var(--panel-2);border:1px solid var(--border);border-radius:13px;padding:16px;text-align:center}
+  .stats span{display:block;font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;font-weight:800}
+  .stats strong{font-size:16.5px;word-break:break-word}
+  .file-drop{display:flex;align-items:center;justify-content:center;gap:10px;border:2px dashed var(--border);border-radius:15px;padding:36px 16px;cursor:pointer;color:var(--muted);font-weight:800;font-size:15.5px;transition:.2s;margin-top:18px;text-align:center}
+  .file-drop:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,183,49,.06)}
+  .sep{border:none;border-top:1px solid var(--border);margin:26px 0}
+  #toast{position:fixed;bottom:125px;left:50%;transform:translate(-50%,20px);background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--on-gold);padding:14px 28px;border-radius:14px;font-weight:800;font-size:15.5px;opacity:0;pointer-events:none;transition:.28s;z-index:300;box-shadow:0 14px 34px rgba(0,0,0,.45);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  @media(max-width:1000px){.two-col{grid-template-columns:1fr}}
+  @media(max-width:860px){.content{padding:20px 16px 140px}.topbar{padding:16px 18px}.topbar h2{font-size:18px}.kpi-grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr}.hero{padding:44px 22px}}
+  @media(max-width:680px){.nav-item .nav-label{display:none}.nav-item.active .nav-label{display:block;font-size:11px}.nav-item{padding:10px 4px;max-width:none;min-width:44px}.nav-item .nav-icon{font-size:22px}.bottom-nav{padding:8px 4px;gap:2px}.sync-badge .sync-text{display:none}.sync-badge{padding:9px}.topbar-date{display:none}}
+  @media(max-width:560px){.kpi-grid{grid-template-columns:1fr}.login-card{padding:38px 22px 26px}.grid-2{grid-template-columns:1fr}.hero{padding:38px 18px}.table{font-size:14.5px}.table th{font-size:11.5px;padding:12px 10px}.table td{padding:14px 10px}.schedule-card{padding:14px;gap:12px}.schedule-date-badge{min-width:62px;padding:9px 12px}.sched-day{font-size:20px}.schedule-member{font-size:16px}}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <div class="logo-badge">LY</div>
+    <h1>LIKELEMBA YETU</h1>
+    <p class="login-sub">Gestion de tontine</p>
+    <form id="loginForm" autocomplete="off">
+      <div class="field">
+        <label>Clé d'accès</label>
+        <div class="input-wrap">
+          <input type="password" id="accessKey" placeholder="••••••••••" autocomplete="off" required>
+          <button type="button" id="togglePwd" title="Afficher / masquer">👁️</button>
+        </div>
+      </div>
+      <div class="error" id="loginError"></div>
+      <button type="submit" class="btn btn-gold btn-block">Accéder à l'application</button>
+    </form>
+    <p class="login-foot">© 2026 LIKELEMBA YETU — Tous droits réservés</p>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <main class="main">
+    <header class="topbar">
+      <h2 id="pageTitle">Accueil</h2>
+      <div class="topbar-right">
+        <span id="syncStatus" class="sync-badge local"><span class="sync-dot"></span><span class="sync-text">Local</span></span>
+        <span class="topbar-date" id="todayDate"></span>
+        <button id="themeToggle" class="icon-btn theme-toggle" title="Changer de thème">☀️</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section id="page-home" class="page active">
+        <div class="hero">
+          <div class="hero-eyebrow">Bienvenue dans votre espace</div>
+          <h1 class="hero-title">KARIBUNI SANA</h1>
+          <div class="hero-sub">KATIKA LIKELEMBA YETU</div>
+          <p class="hero-desc">
+            Votre application de gestion de tontine, simple et sécurisée.
+            Enregistrez les membres, suivez les cotisations et les retraits en FC,
+            programmez les bénéficiaires du pot et gardez un œil sur chaque solde — en toute transparence.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-gold" data-goto="dashboard">📊 Voir le tableau de bord</button>
+            <button class="btn btn-ghost" data-goto="schedule">📅 Programmations</button>
+          </div>
+        </div>
+        <div id="homeNextSchedule"></div>
+        <div class="kpi-grid">
+          <div class="kpi kpi-gold"><div class="kpi-icon">💰</div><div><div class="kpi-label">Solde total de la caisse</div><div class="kpi-value" id="homeSolde">0 FC</div></div></div>
+          <div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Membres enregistrés</div><div class="kpi-value" id="homeMembres">0</div></div></div>
+          <div class="kpi"><div class="kpi-icon">🧾</div><div><div class="kpi-label">Opérations enregistrées</div><div class="kpi-value" id="homeOps">0</div></div></div>
+        </div>
+      </section>
+
+      <section id="page-dashboard" class="page">
+        <div id="dashNextSchedule"></div>
+        <div class="kpi-grid">
+          <div class="kpi kpi-gold"><div class="kpi-icon">💰</div><div><div class="kpi-label">Solde total de la caisse</div><div class="kpi-value" id="kpiSolde">0 FC</div></div></div>
+          <div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Membres enregistrés</div><div class="kpi-value" id="kpiMembres">0</div></div></div>
+          <div class="kpi"><div class="kpi-icon">📥</div><div><div class="kpi-label">Total entrées</div><div class="kpi-value pos" id="kpiCotisations">0 FC</div></div></div>
+          <div class="kpi"><div class="kpi-icon">📤</div><div><div class="kpi-label">Total retraits</div><div class="kpi-value neg" id="kpiRetraits">0 FC</div></div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head"><h3>Classement des membres</h3><button class="btn btn-sm btn-ghost" data-goto="members">Voir tous</button></div>
+            <div class="table-wrap"><table class="table" id="rankTable"><thead><tr><th>#</th><th>Membre</th><th class="text-right">Solde</th></tr></thead><tbody></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Dernières opérations</h3><button class="btn btn-sm btn-ghost" data-goto="transactions">Voir toutes</button></div>
+            <div id="recentTx" class="tx-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-members" class="page">
+        <div class="card">
+          <div class="card-head"><h3>Liste des membres</h3><button class="btn btn-gold btn-sm" id="addMemberBtn">+ Nouveau membre</button></div>
+          <div class="filters"><input type="search" id="memberSearch" placeholder="🔍 Rechercher un membre (nom, téléphone)..."></div>
+          <div class="table-wrap">
+            <table class="table" id="memberTable">
+              <thead><tr><th>Membre</th><th>Téléphone</th><th>Adhésion</th><th class="text-right">Solde</th><th class="text-right">Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-transactions" class="page">
+        <div class="card">
+          <div class="card-head"><h3>Toutes les opérations</h3><button class="btn btn-gold btn-sm" id="addTxBtn">+ Nouvelle opération</button></div>
+          <div class="filters">
+            <input type="search" id="txSearch" placeholder="🔍 Rechercher...">
+            <select id="txFilterMember"><option value="">Tous les membres</option></select>
+            <select id="txFilterType"><option value="">Tous les types</option><option value="cotisation">Cotisation</option><option value="amende">Amende</option><option value="retrait">Retrait</option></select>
+          </div>
+          <div class="table-wrap">
+            <table class="table" id="txTable">
+              <thead><tr><th>Date</th><th>Membre</th><th>Type</th><th>Description</th><th class="text-right">Montant</th><th class="text-right">Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-schedule" class="page">
+        <div class="card">
+          <div class="card-head"><h3>📅 Programmation des bénéficiaires</h3><button class="btn btn-gold btn-sm" id="addScheduleBtn">+ Programmer un bénéficiaire</button></div>
+          <p class="muted" style="margin-bottom:18px">Planifiez à l'avance le membre qui recevra le pot de la tontine, avec la date, le jour et l'heure exacts.</p>
+          <div class="filters">
+            <input type="search" id="scheduleSearch" placeholder="🔍 Rechercher un bénéficiaire...">
+            <select id="scheduleFilterStatus"><option value="">Tous les statuts</option><option value="prevu">À venir</option><option value="effectue">Effectuées</option><option value="late">En retard</option></select>
+          </div>
+          <div id="scheduleList"></div>
+        </div>
+      </section>
+
+      <section id="page-history" class="page">
+        <div class="card">
+          <div class="card-head"><h3>📜 Journal d'activité</h3><button class="btn btn-danger btn-sm" id="clearHistoryBtn">🧹 Vider l'historique</button></div>
+          <div class="filters">
+            <input type="search" id="histSearch" placeholder="🔍 Rechercher dans l'historique...">
+            <select id="histFilter"><option value="">Tous les événements</option><option value="member">Membres</option><option value="tx">Opérations</option><option value="schedule">Programmation</option><option value="system">Système</option></select>
+          </div>
+          <div id="historyList"></div>
+        </div>
+      </section>
+
+      <section id="page-backup" class="page">
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head"><h3>💾 Sauvegarde des données</h3></div>
+            <p class="muted">Exportez vos données pour les conserver en lieu sûr ou les transférer sur un autre appareil.</p>
+            <div class="btn-row"><button class="btn btn-gold" id="exportJsonBtn">⬇ Exporter (JSON)</button><button class="btn btn-ghost" id="exportCsvBtn">⬇ Exporter (CSV)</button></div>
+            <div class="stats">
+              <div><span>Membres</span><strong id="statMembers">0</strong></div>
+              <div><span>Opérations</span><strong id="statTx">0</strong></div>
+              <div><span>Solde total</span><strong id="statSolde">0 FC</strong></div>
+            </div>
+            <div class="stats" style="margin-top:12px">
+              <div><span>Programmations</span><strong id="statSchedules">0</strong></div>
+              <div><span>À venir</span><strong id="statUpcoming">0</strong></div>
+              <div><span>Effectuées</span><strong id="statDone">0</strong></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>♻️ Restauration</h3></div>
+            <p class="muted">Importez un fichier de sauvegarde JSON. Les données actuelles seront remplacées.</p>
+            <label class="file-drop"><input type="file" id="importFile" accept="application/json,.json" hidden><span>📁 Choisir un fichier de sauvegarde</span></label>
+            <hr class="sep">
+            <h4 class="mini-title">Zone de danger</h4>
+            <p class="muted">Supprime définitivement toutes les données de l'application.</p>
+            <div class="btn-row"><button class="btn btn-danger" id="resetBtn">🗑 Réinitialiser toutes les données</button></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="home"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></button>
+    <button class="nav-item" data-page="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Tableau</span></button>
+    <button class="nav-item" data-page="members"><span class="nav-icon">👥</span><span class="nav-label">Membres</span></button>
+    <button class="nav-item" data-page="transactions"><span class="nav-icon">💰</span><span class="nav-label">Transactions</span></button>
+    <button class="nav-item" data-page="schedule"><span class="nav-icon">📅</span><span class="nav-label">Programmation</span></button>
+    <button class="nav-item" data-page="history"><span class="nav-icon">📜</span><span class="nav-label">Historique</span></button>
+    <button class="nav-item" data-page="backup"><span class="nav-icon">⚙️</span><span class="nav-label">Sauvegarde</span></button>
+    <button class="nav-item logout" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-label">Quitter</span></button>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* =========================================================
+   CONFIGURATION FIREBASE
+   =========================================================
+   1. Créez un projet sur https://console.firebase.google.com
+   2. Activez "Realtime Database" en mode Test
+   3. Copiez l'URL de votre base (ex: https://xxx-default-rtdb.firebaseio.com)
+   4. Collez-la ci-dessous entre les guillemets
+   5. (Conseil) Changez le "path" pour un nom unique à vous
+   ========================================================= */
+const FIREBASE_CONFIG = {
+  databaseURL: "",                                // ← COLLEZ VOTRE URL ICI
+  path: "likelemba_yetu_data"                     // ← Personnalisez ce nom
+};
+
+const STORAGE_KEY = 'likelemba_yetu_data_v1';
+const THEME_KEY   = 'likelemba_yetu_theme';
+const ACCESS_KEY  = 'LIKELEMBA';
+const HIST_MAX    = 500;
+const TYPE_LABEL  = { cotisation:'Cotisation', amende:'Amende', retrait:'Retrait' };
+const TYPE_ICON   = { cotisation:'📥', amende:'⚖️', retrait:'📤' };
+
+const HISTORY_META = {
+  'login':{icon:'🔓',badge:'info',group:'system',label:'Connexion'},
+  'logout':{icon:'🔒',badge:'info',group:'system',label:'Déconnexion'},
+  'member-add':{icon:'👤',badge:'add',group:'member',label:'Membre ajouté'},
+  'member-edit':{icon:'✏️',badge:'edit',group:'member',label:'Membre modifié'},
+  'member-delete':{icon:'🗑️',badge:'del',group:'member',label:'Membre supprimé'},
+  'tx-add':{icon:'➕',badge:'add',group:'tx',label:'Opération ajoutée'},
+  'tx-edit':{icon:'✏️',badge:'edit',group:'tx',label:'Opération modifiée'},
+  'tx-delete':{icon:'🗑️',badge:'del',group:'tx',label:'Opération supprimée'},
+  'schedule-add':{icon:'📅',badge:'add',group:'schedule',label:'Bénéficiaire programmé'},
+  'schedule-edit':{icon:'✏️',badge:'edit',group:'schedule',label:'Programmation modifiée'},
+  'schedule-delete':{icon:'🗑️',badge:'del',group:'schedule',label:'Programmation supprimée'},
+  'schedule-done':{icon:'✅',badge:'add',group:'schedule',label:'Réception validée'},
+  'restore':{icon:'♻️',badge:'info',group:'system',label:'Restauration'},
+  'reset':{icon:'⚠️',badge:'del',group:'system',label:'Réinitialisation'},
+  'history-clear':{icon:'🧹',badge:'info',group:'system',label:'Historique vidé'}
+};
+
+let state = { members: [], transactions: [], history: [], schedules: [] };
+let database = null;
+let firebaseReady = false;
+let pendingWrite = false;
+let lastLocalWrite = '';
+
+const $  = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function fmt(n){const v=Math.round(Number(n)||0);return v.toLocaleString('fr-FR').replace(/\u202f/g,' ')+' FC'}
+function todayISO(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+function fmtDate(iso){if(!iso)return'—';const d=new Date(iso+'T00:00:00');if(isNaN(d.getTime()))return iso;return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}
+function fmtLongDate(iso){if(!iso)return'—';const d=new Date(iso+'T00:00:00');if(isNaN(d.getTime()))return iso;return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function fmtDateTime(ts){const d=new Date(ts);if(isNaN(d.getTime()))return'—';return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
+function memberName(id){const m=state.members.find(x=>x.id===id);return m?(m.prenom+' '+m.nom).trim():'Membre inconnu'}
+
+function logHistory(kind, detail){
+  if(!HISTORY_META[kind])return;
+  state.history.unshift({id:uid(),kind,detail,at:Date.now()});
+  if(state.history.length>HIST_MAX)state.history=state.history.slice(0,HIST_MAX);
+  saveState();
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const data = JSON.parse(raw);
+      state.members      = Array.isArray(data.members) ? data.members : [];
+      state.transactions = Array.isArray(data.transactions) ? data.transactions : [];
+      state.history      = Array.isArray(data.history) ? data.history : [];
+      state.schedules    = Array.isArray(data.schedules) ? data.schedules : [];
+    }
+  }catch(e){console.error('Erreur chargement local:',e)}
+}
+
+function saveState(){
+  const json = JSON.stringify(state);
+  try{ localStorage.setItem(STORAGE_KEY, json); }
+  catch(e){ alert('Impossible de sauvegarder localement (stockage plein).'); }
+
+  if(database && firebaseReady){
+    lastLocalWrite = json;
+    database.ref(FIREBASE_CONFIG.path).set(state)
+      .then(()=>{ lastLocalWrite = ''; pendingWrite = false; })
+      .catch(err=>{
+        console.error('Erreur Firebase:',err);
+        lastLocalWrite = '';
+        pendingWrite = true;
+        setSyncStatus('offline','Hors ligne');
+      });
+  } else if(database){
+    pendingWrite = true;
+  }
+}
+
+function memberBalance(id){
+  return state.transactions.filter(t=>t.membreId===id)
+    .reduce((s,t)=>s+(t.type==='retrait'?-Math.abs(t.montant):Math.abs(t.montant)),0);
+}
+function totalByType(type){
+  return state.transactions.filter(t=>t.type===type).reduce((s,t)=>s+Math.abs(t.montant),0);
+}
+function totalBalance(){ return state.members.reduce((s,m)=>s+memberBalance(m.id),0); }
+
+function scheduleDateTime(s){ return new Date((s.date||'1970-01-01')+'T'+(s.heure||'00:00')+':00'); }
+function isScheduleLate(s){ if(s.statut==='effectue')return false; return scheduleDateTime(s).getTime() < Date.now(); }
+function effectiveStatus(s){ if(s.statut==='effectue')return'effectue'; return isScheduleLate(s)?'late':'prevu'; }
+function sortedSchedules(){
+  const copy = state.schedules.slice();
+  copy.sort((a,b)=>{
+    const sa=effectiveStatus(a), sb=effectiveStatus(b);
+    const rank={prevu:0,late:1,effectue:2};
+    if(rank[sa]!==rank[sb])return rank[sa]-rank[sb];
+    const ka=(a.date||'')+(a.heure||''), kb=(b.date||'')+(b.heure||'');
+    if(sa==='effectue')return kb.localeCompare(ka);
+    return ka.localeCompare(kb);
+  });
+  return copy;
+}
+function getNextSchedule(){
+  const up = state.schedules.filter(s=>s.statut==='prevu' && scheduleDateTime(s).getTime()>=Date.now())
+    .sort((a,b)=>scheduleDateTime(a)-scheduleDateTime(b));
+  return up[0]||null;
+}
+function nextScheduleHTML(s){
+  if(!s) return `<div class="next-sched-empty">📅 Aucun bénéficiaire programmé pour le moment — <a href="#" onclick="goTo('schedule'); return false;" style="color:var(--gold);font-weight:800;text-decoration:none">programmer maintenant</a></div>`;
+  const h = s.heure||'00:00';
+  return `<div class="next-schedule">
+    <div class="next-sched-icon">🏆</div>
+    <div class="next-sched-main">
+      <div class="next-sched-label">Prochain bénéficiaire du pot</div>
+      <div class="next-sched-name">${esc(memberName(s.membreId))}</div>
+      <div class="next-sched-when">📅 <strong>${esc(fmtLongDate(s.date))}</strong> · 🕒 <strong>${esc(h)}</strong>${s.montant?' · 💰 '+esc(fmt(s.montant)):''}</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" data-goto="schedule">Voir</button>
+  </div>`;
+}
+
+let toastTimer;
+function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2600); }
+
+function openModal(html){ $('#modalBox').innerHTML=html; $('#modalOverlay').classList.add('show'); }
+function closeModal(){ $('#modalOverlay').classList.remove('show'); $('#modalBox').innerHTML=''; }
+$('#modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+function confirmAction(msg){
+  return new Promise(resolve=>{
+    openModal(`<div class="modal-head"><h3>Confirmation</h3></div><p class="confirm-msg">${msg}</p><div class="modal-actions"><button class="btn btn-ghost" id="cfNo">Annuler</button><button class="btn btn-danger" id="cfYes">Confirmer</button></div>`);
+    $('#cfNo').onclick = ()=>{ closeModal(); resolve(false); };
+    $('#cfYes').onclick = ()=>{ closeModal(); resolve(true); };
+  });
+}
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_KEY, theme);
+  const btn = $('#themeToggle');
+  if(btn) btn.textContent = theme==='dark'?'☀️':'🌙';
+}
+function initTheme(){ const saved=localStorage.getItem(THEME_KEY); applyTheme(saved==='light'?'light':'dark'); }
+$('#themeToggle').addEventListener('click', ()=>{ const cur=document.documentElement.getAttribute('data-theme'); applyTheme(cur==='dark'?'light':'dark'); });
+
+/* ================= FIREBASE ================= */
+function setSyncStatus(status, text){
+  const el = $('#syncStatus');
+  if(!el)return;
+  el.className = 'sync-badge '+status;
+  el.innerHTML = '<span class="sync-dot"></span><span class="sync-text">'+text+'</span>';
+  el.title = text;
+}
+
+function initFirebase(){
+  if(typeof firebase === 'undefined'){
+    console.warn('Firebase SDK non chargé — mode local uniquement');
+    setSyncStatus('local','Local');
+    return;
+  }
+  if(!FIREBASE_CONFIG.databaseURL){
+    console.info('Aucune databaseURL — mode local uniquement');
+    setSyncStatus('local','Local');
+    return;
+  }
+  try{
+    firebase.initializeApp({ databaseURL: FIREBASE_CONFIG.databaseURL });
+    database = firebase.database();
+    const ref = database.ref(FIREBASE_CONFIG.path);
+    setSyncStatus('syncing','Connexion...');
+
+    database.ref('.info/connected').on('value', snap=>{
+      const online = snap.val() === true;
+      firebaseReady = online;
+      if(online){
+        setSyncStatus('online','Synchronisé');
+        if(pendingWrite){
+          const json = JSON.stringify(state);
+          lastLocalWrite = json;
+          ref.set(state).then(()=>{ lastLocalWrite=''; pendingWrite=false; }).catch(console.error);
+        }
+      }else{
+        setSyncStatus('offline','Hors ligne');
+      }
+    });
+
+    ref.on('value', snapshot=>{
+      const data = snapshot.val();
+      if(!data){
+        if(state.members.length||state.transactions.length||state.schedules.length){
+          saveState();
+        }
+        return;
+      }
+      const remoteJson = JSON.stringify(data);
+      if(lastLocalWrite && remoteJson === lastLocalWrite) return;
+      if(remoteJson === JSON.stringify(state)) return;
+      state.members      = Array.isArray(data.members)      ? data.members      : [];
+      state.transactions = Array.isArray(data.transactions) ? data.transactions : [];
+      state.history      = Array.isArray(data.history)      ? data.history      : [];
+      state.schedules    = Array.isArray(data.schedules)    ? data.schedules    : [];
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+      renderAll();
+    }, err=>{
+      console.error('Erreur listener Firebase:',err);
+      setSyncStatus('offline','Hors ligne');
+    });
+  }catch(e){
+    console.error('Erreur init Firebase:',e);
+    setSyncStatus('local','Local');
+  }
+}
+
+/* ================= AUTH ================= */
+$('#loginForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const val = $('#accessKey').value.trim().toUpperCase();
+  if(val === ACCESS_KEY){
+    sessionStorage.setItem('ly_auth','1');
+    logHistory('login','Connexion réussie à l\'application');
+    showApp();
+  }else{
+    $('#loginError').textContent = "Clé d'accès incorrecte. Veuillez réessayer.";
+    $('#accessKey').value = '';
+    $('#accessKey').focus();
+  }
+});
+$('#accessKey').addEventListener('input', ()=>{ $('#loginError').textContent=''; });
+$('#togglePwd').addEventListener('click', ()=>{ const inp=$('#accessKey'); inp.type = inp.type==='password'?'text':'password'; inp.focus(); });
+
+function showApp(){
+  $('#loginScreen').style.display='none';
+  $('#app').classList.remove('hidden');
+  $('#todayDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  renderAll();
+}
+$('#logoutBtn').addEventListener('click', ()=>{ logHistory('logout','Déconnexion'); sessionStorage.removeItem('ly_auth'); location.reload(); });
+
+/* ================= NAV ================= */
+const PAGE_TITLES = {home:'Accueil',dashboard:'Tableau de bord',members:'Membres',transactions:'Transactions',schedule:'Programmation',history:'Historique',backup:'Sauvegarde & Restauration'};
+function goTo(page){
+  $$('.nav-item[data-page]').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
+  $$('.page').forEach(p=>p.classList.toggle('active', p.id==='page-'+page));
+  $('#pageTitle').textContent = PAGE_TITLES[page]||'';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$$('.nav-item[data-page]').forEach(btn=>btn.addEventListener('click',()=>goTo(btn.dataset.page)));
+document.addEventListener('click', e=>{ const btn=e.target.closest('[data-goto]'); if(btn) goTo(btn.dataset.goto); });
+
+/* ================= RENDER ================= */
+function renderAll(){ renderHome(); renderDashboard(); renderMembers(); renderTransactions(); renderSchedule(); renderHistory(); renderBackup(); }
+
+function renderHome(){
+  $('#homeSolde').textContent = fmt(totalBalance());
+  $('#homeMembres').textContent = state.members.length;
+  $('#homeOps').textContent = state.transactions.length;
+  $('#homeNextSchedule').innerHTML = nextScheduleHTML(getNextSchedule());
+}
+function renderDashboard(){
+  $('#kpiSolde').textContent = fmt(totalBalance());
+  $('#kpiMembres').textContent = state.members.length;
+  $('#kpiCotisations').textContent = fmt(totalByType('cotisation')+totalByType('amende'));
+  $('#kpiRetraits').textContent = fmt(totalByType('retrait'));
+  $('#dashNextSchedule').innerHTML = nextScheduleHTML(getNextSchedule());
+  const ranks = state.members.map(m=>({m,b:memberBalance(m.id)})).sort((a,b)=>b.b-a.b).slice(0,8);
+  $('#rankTable tbody').innerHTML = ranks.length ? ranks.map((r,i)=>`<tr><td><span class="rank">${i+1}</span></td><td>${esc(r.m.prenom)} ${esc(r.m.nom)}</td><td class="text-right ${r.b>=0?'pos':'neg'}">${fmt(r.b)}</td></tr>`).join('') : '<tr><td colspan="3" class="empty">Aucun membre enregistré</td></tr>';
+  const recent = sortedTransactions().slice(0,6);
+  $('#recentTx').innerHTML = recent.length ? recent.map(txItemHTML).join('') : '<div class="empty">Aucune opération enregistrée</div>';
+}
+function sortedTransactions(){
+  return state.transactions.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||((b.createdAt||0)-(a.createdAt||0)));
+}
+function txItemHTML(t){
+  const sign = t.type==='retrait'?'−':'+';
+  return `<div class="tx-item"><div class="tx-icon ${t.type}">${TYPE_ICON[t.type]||'💵'}</div><div class="tx-main"><div class="tx-title">${esc(memberName(t.membreId))}</div><div class="tx-sub">${TYPE_LABEL[t.type]||''} · ${fmtDate(t.date)}${t.description?' · '+esc(t.description):''}</div></div><div class="tx-amount ${t.type==='retrait'?'neg':'pos'}">${sign}${fmt(Math.abs(t.montant))}</div></div>`;
+}
+function renderMembers(){
+  const q = ($('#memberSearch').value||'').toLowerCase().trim();
+  const list = state.members.filter(m=>!q||`${m.prenom} ${m.nom} ${m.telephone||''}`.toLowerCase().includes(q));
+  $('#memberTable tbody').innerHTML = list.length ? list.map(m=>{
+    const b = memberBalance(m.id);
+    const initials = ((m.prenom||' ')[0]+(m.nom||' ')[0]).toUpperCase();
+    return `<tr><td><div class="member-cell"><div class="avatar">${esc(initials)}</div><div><strong>${esc(m.prenom)} ${esc(m.nom)}</strong>${m.note?`<div class="muted small">${esc(m.note)}</div>`:''}</div></div></td><td>${esc(m.telephone||'—')}</td><td>${fmtDate(m.dateAdhesion)}</td><td class="text-right ${b>=0?'pos':'neg'}">${fmt(b)}</td><td class="text-right" style="white-space:nowrap"><button class="icon-btn" title="Voir le profil" onclick="openMemberProfile('${m.id}')">👁️</button><button class="icon-btn" title="Modifier" onclick="openMemberForm('${m.id}')">✏️</button><button class="icon-btn" title="Supprimer" onclick="deleteMember('${m.id}')">🗑️</button></td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty">Aucun membre enregistré</td></tr>';
+}
+function renderTransactions(){
+  const sel = $('#txFilterMember'), prev = sel.value;
+  sel.innerHTML = '<option value="">Tous les membres</option>'+state.members.map(m=>`<option value="${m.id}">${esc(m.prenom+' '+m.nom)}</option>`).join('');
+  if(prev && state.members.some(m=>m.id===prev)) sel.value = prev;
+  const q = ($('#txSearch').value||'').toLowerCase().trim(), fm = sel.value, ft = $('#txFilterType').value;
+  let list = sortedTransactions();
+  if(fm) list = list.filter(t=>t.membreId===fm);
+  if(ft) list = list.filter(t=>t.type===ft);
+  if(q) list = list.filter(t=>(memberName(t.membreId)+' '+(t.description||'')+' '+t.montant).toLowerCase().includes(q));
+  $('#txTable tbody').innerHTML = list.length ? list.map(t=>{
+    const sign = t.type==='retrait'?'−':'+';
+    return `<tr><td>${fmtDate(t.date)}</td><td>${esc(memberName(t.membreId))}</td><td><span class="badge ${t.type}">${TYPE_LABEL[t.type]||t.type}</span></td><td>${esc(t.description||'—')}</td><td class="text-right ${t.type==='retrait'?'neg':'pos'}">${sign}${fmt(Math.abs(t.montant))}</td><td class="text-right" style="white-space:nowrap"><button class="icon-btn" title="Modifier" onclick="openTransactionForm('${t.id}')">✏️</button><button class="icon-btn" title="Supprimer" onclick="deleteTransaction('${t.id}')">🗑️</button></td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="empty">Aucune opération trouvée</td></tr>';
+}
+function renderSchedule(){
+  const q = ($('#scheduleSearch').value||'').toLowerCase().trim(), fs = $('#scheduleFilterStatus').value;
+  let list = sortedSchedules();
+  if(fs) list = list.filter(s=>effectiveStatus(s)===fs);
+  if(q) list = list.filter(s=>(memberName(s.membreId)+' '+(s.note||'')+' '+(s.date||'')).toLowerCase().includes(q));
+  const next = getNextSchedule();
+  if(!list.length){ $('#scheduleList').innerHTML = '<div class="empty">Aucune programmation pour le moment</div>'; return; }
+  $('#scheduleList').innerHTML = list.map(s=>{
+    const st = effectiveStatus(s);
+    const d = new Date(s.date+'T00:00:00');
+    const day = isNaN(d)?'--':String(d.getDate()).padStart(2,'0');
+    const month = isNaN(d)?'---':d.toLocaleDateString('fr-FR',{month:'short'}).toUpperCase().replace('.','');
+    const statusBadge = st==='effectue'?'<span class="badge effectue">✅ Effectuée</span>':st==='late'?'<span class="badge late">⚠️ En retard</span>':'<span class="badge prevu">📅 À venir</span>';
+    const cardClass = st==='effectue'?'done':st==='late'?'late':(next&&next.id===s.id?'next':'');
+    return `<div class="schedule-card ${cardClass}"><div class="schedule-date-badge"><div class="sched-day">${esc(day)}</div><div class="sched-month">${esc(month)}</div></div><div class="schedule-main"><div class="schedule-member">${esc(memberName(s.membreId))} ${statusBadge}</div><div class="schedule-details">📅 <strong>${esc(fmtLongDate(s.date))}</strong> · 🕒 <strong>${esc(s.heure||'00:00')}</strong>${s.montant?' · 💰 <strong>'+esc(fmt(s.montant))+'</strong>':''}</div>${s.note?`<div class="schedule-note">📝 ${esc(s.note)}</div>`:''}</div><div class="schedule-actions">${st!=='effectue'?`<button class="btn btn-success btn-sm" onclick="markScheduleDone('${s.id}')">✅ Valider</button>`:''}<button class="icon-btn" title="Modifier" onclick="openScheduleForm('${s.id}')">✏️</button><button class="icon-btn" title="Supprimer" onclick="deleteSchedule('${s.id}')">🗑️</button></div></div>`;
+  }).join('');
+}
+function renderHistory(){
+  const q = ($('#histSearch').value||'').toLowerCase().trim(), fg = $('#histFilter').value;
+  let list = state.history;
+  if(fg) list = list.filter(h=>(HISTORY_META[h.kind]?.group||'')===fg);
+  if(q) list = list.filter(h=>((HISTORY_META[h.kind]?.label||'')+' '+(h.detail||'')).toLowerCase().includes(q));
+  $('#historyList').innerHTML = list.length ? list.map(h=>{
+    const meta = HISTORY_META[h.kind]||{icon:'•',badge:'info',label:h.kind};
+    return `<div class="hist-row"><div class="hist-icon">${meta.icon}</div><div class="hist-main"><div class="hist-msg">${esc(h.detail||meta.label)}</div><div class="hist-time">${fmtDateTime(h.at)}</div></div><span class="badge ${meta.badge}">${meta.label}</span></div>`;
+  }).join('') : '<div class="empty">Aucun événement dans l\'historique</div>';
+}
+function renderBackup(){
+  $('#statMembers').textContent = state.members.length;
+  $('#statTx').textContent = state.transactions.length;
+  $('#statSolde').textContent = fmt(totalBalance());
+  $('#statSchedules').textContent = state.schedules.length;
+  $('#statUpcoming').textContent = state.schedules.filter(s=>effectiveStatus(s)==='prevu').length;
+  $('#statDone').textContent = state.schedules.filter(s=>s.statut==='effectue').length;
+}
+
+/* ================= FORMS ================= */
+function openMemberForm(id){
+  const m = id ? state.members.find(x=>x.id===id) : null;
+  openModal(`
+    <div class="modal-head"><h3>${m?'Modifier le membre':'Nouveau membre'}</h3><button class="icon-btn" type="button" onclick="closeModal()">✕</button></div>
+    <form id="memberForm" class="form" autocomplete="off">
+      <div class="grid-2"><div class="field"><label>Prénom *</label><input name="prenom" required maxlength="40" value="${esc(m?.prenom||'')}" placeholder="Ex: Jean"></div><div class="field"><label>Nom *</label><input name="nom" required maxlength="40" value="${esc(m?.nom||'')}" placeholder="Ex: Kabila"></div></div>
+      <div class="grid-2"><div class="field"><label>Téléphone</label><input name="telephone" maxlength="25" value="${esc(m?.telephone||'')}" placeholder="+243 ..."></div><div class="field"><label>Date d'adhésion</label><input type="date" name="dateAdhesion" value="${m?.dateAdhesion||todayISO()}"></div></div>
+      <div class="field"><label>Note / Observation</label><textarea name="note" rows="2" maxlength="120" placeholder="Facultatif">${esc(m?.note||'')}</textarea></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="closeModal()">Annuler</button><button type="submit" class="btn btn-gold">${m?'Enregistrer':'Ajouter le membre'}</button></div>
+    </form>`);
+  $('#memberForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const data = { prenom:(f.get('prenom')||'').trim(), nom:(f.get('nom')||'').trim(), telephone:(f.get('telephone')||'').trim(), dateAdhesion:f.get('dateAdhesion')||todayISO(), note:(f.get('note')||'').trim() };
+    if(!data.prenom||!data.nom)return;
+    if(m){ Object.assign(m,data); logHistory('member-edit',`Membre modifié : ${data.prenom} ${data.nom}`); }
+    else { state.members.push({id:uid(),createdAt:Date.now(),...data}); logHistory('member-add',`Membre ajouté : ${data.prenom} ${data.nom}`); }
+    closeModal(); renderAll(); toast(m?'Membre modifié':'Membre ajouté');
+  });
+}
+
+function openMemberProfile(id){
+  const m = state.members.find(x=>x.id===id); if(!m) return;
+  const bal = memberBalance(id);
+  const txs = state.transactions.filter(t=>t.membreId===id).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||((b.createdAt||0)-(a.createdAt||0)));
+  const scheds = state.schedules.filter(s=>s.membreId===id).sort((a,b)=>scheduleDateTime(a)-scheduleDateTime(b));
+  openModal(`
+    <div class="modal-head"><h3>${esc(m.prenom)} ${esc(m.nom)}</h3><button class="icon-btn" type="button" onclick="closeModal()">✕</button></div>
+    <div class="profile-balance"><div class="pb-label">Solde du membre</div><div class="pb-value ${bal>=0?'':'neg'}">${fmt(bal)}</div></div>
+    <div class="profile-info"><div><span>Téléphone</span><strong>${esc(m.telephone||'—')}</strong></div><div><span>Date d'adhésion</span><strong>${fmtDate(m.dateAdhesion)}</strong></div><div><span>Observation</span><strong>${esc(m.note||'—')}</strong></div><div><span>Programmations</span><strong>${scheds.length}</strong></div></div>
+    <h4 class="mini-title">Historique des opérations (${txs.length})</h4>
+    <div class="tx-list" style="max-height:240px">${txs.length?txs.map(txItemHTML).join(''):'<div class="empty">Aucune opération</div>'}</div>
+    <h4 class="mini-title" style="margin-top:18px">Programmations (${scheds.length})</h4>
+    <div style="max-height:220px;overflow-y:auto">${scheds.length?scheds.map(s=>{const st=effectiveStatus(s);const badge=st==='effectue'?'✅ Effectuée':st==='late'?'⚠️ En retard':'📅 À venir';return`<div class="schedule-card" style="padding:12px;margin-bottom:8px"><div class="schedule-main"><div class="schedule-details" style="font-size:14px">📅 <strong>${esc(fmtLongDate(s.date))}</strong> · 🕒 <strong>${esc(s.heure||'00:00')}</strong>${s.montant?' · 💰 '+esc(fmt(s.montant)):''}<br><span class="muted">${badge}</span></div></div></div>`;}).join(''):'<div class="empty">Aucune programmation</div>'}</div>
+    <div class="modal-actions"><button class="btn btn-ghost" type="button" onclick="closeModal()">Fermer</button><button class="btn btn-gold" type="button" onclick="closeModal(); openTransactionForm(null, '${m.id}')">+ Nouvelle opération</button></div>`);
+}
+
+function openTransactionForm(id, presetMember){
+  const t = id ? state.transactions.find(x=>x.id===id) : null;
+  if(!state.members.length){
+    openModal(`<div class="modal-head"><h3>Aucun membre</h3></div><p class="confirm-msg">Veuillez d'abord enregistrer au moins un membre.</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Fermer</button><button class="btn btn-gold" onclick="closeModal(); goTo('members'); openMemberForm()">+ Ajouter un membre</button></div>`);
+    return;
+  }
+  const currentMember = t ? t.membreId : (presetMember||'');
+  const currentType = t ? t.type : 'cotisation';
+  openModal(`
+    <div class="modal-head"><h3>${t?"Modifier l'opération":'Nouvelle opération'}</h3><button class="icon-btn" type="button" onclick="closeModal()">✕</button></div>
+    <form id="txForm" class="form" autocomplete="off">
+      <div class="field"><label>Membre *</label><select name="membreId" required><option value="">— Choisir —</option>${state.members.map(m=>`<option value="${m.id}" ${m.id===currentMember?'selected':''}>${esc(m.prenom+' '+m.nom)} — ${fmt(memberBalance(m.id))}</option>`).join('')}</select></div>
+      <div class="grid-2"><div class="field"><label>Type *</label><select name="type" required><option value="cotisation" ${currentType==='cotisation'?'selected':''}>Cotisation (+)</option><option value="amende" ${currentType==='amende'?'selected':''}>Amende (+)</option><option value="retrait" ${currentType==='retrait'?'selected':''}>Retrait (−)</option></select></div><div class="field"><label>Montant (FC) *</label><input type="number" name="montant" min="1" step="1" required value="${t?Math.abs(t.montant):''}" placeholder="0"></div></div>
+      <div class="grid-2"><div class="field"><label>Date *</label><input type="date" name="date" required value="${t?.date||todayISO()}"></div><div class="field"><label>Description</label><input name="description" maxlength="80" value="${esc(t?.description||'')}" placeholder="Ex: Cotisation hebdo"></div></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="closeModal()">Annuler</button><button type="submit" class="btn btn-gold">${t?'Enregistrer':'Ajouter'}</button></div>
+    </form>`);
+  $('#txForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const data = { membreId:f.get('membreId'), type:f.get('type'), montant:Math.abs(parseInt(f.get('montant'),10))||0, date:f.get('date')||todayISO(), description:(f.get('description')||'').trim() };
+    if(!data.membreId||!data.montant)return;
+    const label = `${TYPE_LABEL[data.type]} de ${fmt(data.montant)} pour ${memberName(data.membreId)}`;
+    if(t){ Object.assign(t,data); logHistory('tx-edit',`Opération modifiée : ${label}`); }
+    else { state.transactions.push({id:uid(),createdAt:Date.now(),...data}); logHistory('tx-add',`Opération ajoutée : ${label}`); }
+    closeModal(); renderAll(); toast(t?'Opération modifiée':'Opération enregistrée');
+  });
+}
+
+function openScheduleForm(id, presetMember){
+  const s = id ? state.schedules.find(x=>x.id===id) : null;
+  if(!state.members.length){
+    openModal(`<div class="modal-head"><h3>Aucun membre</h3></div><p class="confirm-msg">Veuillez d'abord enregistrer au moins un membre.</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Fermer</button><button class="btn btn-gold" onclick="closeModal(); goTo('members'); openMemberForm()">+ Ajouter un membre</button></div>`);
+    return;
+  }
+  const currentMember = s ? s.membreId : (presetMember||'');
+  const now = new Date();
+  const defaultDate = todayISO();
+  const defaultTime = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  openModal(`
+    <div class="modal-head"><h3>${s?'Modifier la programmation':'Programmer un bénéficiaire'}</h3><button class="icon-btn" type="button" onclick="closeModal()">✕</button></div>
+    <form id="scheduleForm" class="form" autocomplete="off">
+      <div class="field"><label>Bénéficiaire *</label><select name="membreId" required><option value="">— Choisir —</option>${state.members.map(m=>`<option value="${m.id}" ${m.id===currentMember?'selected':''}>${esc(m.prenom+' '+m.nom)} — solde ${fmt(memberBalance(m.id))}</option>`).join('')}</select></div>
+      <div class="grid-2"><div class="field"><label>Date de réception *</label><input type="date" name="date" required value="${s?.date||defaultDate}"></div><div class="field"><label>Heure *</label><input type="time" name="heure" required value="${s?.heure||defaultTime}"></div></div>
+      <div class="grid-2"><div class="field"><label>Montant prévu (FC)</label><input type="number" name="montant" min="0" step="1" value="${s?.montant||''}" placeholder="Facultatif"></div><div class="field"><label>Statut</label><select name="statut"><option value="prevu" ${(!s||s.statut==='prevu')?'selected':''}>À venir</option><option value="effectue" ${(s&&s.statut==='effectue')?'selected':''}>Effectuée</option></select></div></div>
+      <div class="field"><label>Note / Observation</label><textarea name="note" rows="2" maxlength="140" placeholder="Facultatif">${esc(s?.note||'')}</textarea></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="closeModal()">Annuler</button><button type="submit" class="btn btn-gold">${s?'Enregistrer':'Programmer'}</button></div>
+    </form>`);
+  $('#scheduleForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const data = { membreId:(f.get('membreId')||'').trim(), date:f.get('date')||todayISO(), heure:f.get('heure')||'00:00', montant:Math.abs(parseInt(f.get('montant'),10))||0, statut:f.get('statut')==='effectue'?'effectue':'prevu', note:(f.get('note')||'').trim() };
+    if(!data.membreId)return;
+    const label = `${memberName(data.membreId)} le ${fmtLongDate(data.date)} à ${data.heure}`;
+    if(s){ Object.assign(s,data); logHistory('schedule-edit',`Programmation modifiée : ${label}`); }
+    else { state.schedules.push({id:uid(),createdAt:Date.now(),...data}); logHistory('schedule-add',`Bénéficiaire programmé : ${label}`); }
+    closeModal(); renderAll(); toast(s?'Programmation modifiée':'Bénéficiaire programmé');
+  });
+}
+
+async function markScheduleDone(id){
+  const s = state.schedules.find(x=>x.id===id); if(!s) return;
+  const ok = await confirmAction(`Marquer la réception de <strong>${esc(memberName(s.membreId))}</strong> du <strong>${esc(fmtLongDate(s.date))}</strong> à <strong>${esc(s.heure||'00:00')}</strong> comme effectuée ?`);
+  if(!ok) return;
+  s.statut = 'effectue';
+  logHistory('schedule-done',`Réception validée : ${memberName(s.membreId)} le ${fmtLongDate(s.date)} à ${s.heure}`);
+  renderAll(); toast('Réception validée');
+}
+
+async function deleteSchedule(id){
+  const s = state.schedules.find(x=>x.id===id); if(!s) return;
+  const ok = await confirmAction(`Supprimer la programmation de <strong>${esc(memberName(s.membreId))}</strong> du <strong>${esc(fmtLongDate(s.date))}</strong> à <strong>${esc(s.heure||'00:00')}</strong> ?`);
+  if(!ok) return;
+  logHistory('schedule-delete',`Programmation supprimée : ${memberName(s.membreId)} le ${fmtLongDate(s.date)} à ${s.heure}`);
+  state.schedules = state.schedules.filter(x=>x.id!==id);
+  saveState(); renderAll(); toast('Programmation supprimée');
+}
+
+async function deleteMember(id){
+  const m = state.members.find(x=>x.id===id); if(!m) return;
+  const nbTx = state.transactions.filter(t=>t.membreId===id).length;
+  const nbSc = state.schedules.filter(s=>s.membreId===id).length;
+  let msg = `Supprimer <strong>${esc(m.prenom)} ${esc(m.nom)}</strong>`;
+  if(nbTx||nbSc){ msg += ' ainsi que :'; if(nbTx) msg += `<br>• ses <strong>${nbTx}</strong> opération(s)`; if(nbSc) msg += `<br>• ses <strong>${nbSc}</strong> programmation(s)`; }
+  msg += '<br><br>Cette action est irréversible.';
+  const ok = await confirmAction(msg);
+  if(!ok) return;
+  state.members = state.members.filter(x=>x.id!==id);
+  state.transactions = state.transactions.filter(t=>t.membreId!==id);
+  state.schedules = state.schedules.filter(s=>s.membreId!==id);
+  logHistory('member-delete',`Membre supprimé : ${m.prenom} ${m.nom}`+(nbTx?` (${nbTx} opération(s))`:'')+(nbSc?` (${nbSc} programmation(s))`:''));
+  saveState(); renderAll(); toast('Membre supprimé');
+}
+
+async function deleteTransaction(id){
+  const t = state.transactions.find(x=>x.id===id); if(!t) return;
+  const ok = await confirmAction(`Supprimer cette opération (${TYPE_LABEL[t.type]} de <strong>${fmt(Math.abs(t.montant))}</strong>) ?`);
+  if(!ok) return;
+  logHistory('tx-delete',`Opération supprimée : ${TYPE_LABEL[t.type]} de ${fmt(Math.abs(t.montant))} pour ${memberName(t.membreId)}`);
+  state.transactions = state.transactions.filter(x=>x.id!==id);
+  saveState(); renderAll(); toast('Opération supprimée');
+}
+
+$('#addMemberBtn').addEventListener('click', ()=>openMemberForm());
+$('#addTxBtn').addEventListener('click', ()=>openTransactionForm());
+$('#addScheduleBtn').addEventListener('click', ()=>openScheduleForm());
+$('#memberSearch').addEventListener('input', renderMembers);
+$('#txSearch').addEventListener('input', renderTransactions);
+$('#txFilterMember').addEventListener('change', renderTransactions);
+$('#txFilterType').addEventListener('change', renderTransactions);
+$('#scheduleSearch').addEventListener('input', renderSchedule);
+$('#scheduleFilterStatus').addEventListener('change', renderSchedule);
+$('#histSearch').addEventListener('input', renderHistory);
+$('#histFilter').addEventListener('change', renderHistory);
+
+$('#clearHistoryBtn').addEventListener('click', async ()=>{
+  if(!state.history.length){ toast('L\'historique est déjà vide'); return; }
+  const ok = await confirmAction('Vider tout le journal d\'activité ?<br><br>Cette action est irréversible.');
+  if(!ok) return;
+  state.history = [];
+  logHistory('history-clear','Historique vidé par l\'utilisateur');
+  renderHistory(); toast('Historique vidé');
+});
+
+function download(filename, content, mime='application/json'){
+  const blob = new Blob([content],{type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
+$('#exportJsonBtn').addEventListener('click', ()=>{
+  const payload = { app:'LIKELEMBA YETU', version:2, exportedAt:new Date().toISOString(), members:state.members, transactions:state.transactions, schedules:state.schedules, history:state.history };
+  download(`likelemba-yetu-sauvegarde-${todayISO()}.json`, JSON.stringify(payload,null,2));
+  toast('Sauvegarde JSON exportée');
+});
+
+$('#exportCsvBtn').addEventListener('click', ()=>{
+  const rows = [['Date','Membre','Type','Description','Montant (FC)']];
+  sortedTransactions().slice().reverse().forEach(t=>{
+    rows.push([t.date||'', memberName(t.membreId), TYPE_LABEL[t.type]||t.type, (t.description||'').replace(/;/g,','), (t.type==='retrait'?'-':'+')+Math.abs(t.montant)]);
+  });
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+  download(`likelemba-yetu-operations-${todayISO()}.csv`, '\uFEFF'+csv, 'text/csv;charset=utf-8;');
+  toast('Fichier CSV exporté');
+});
+
+$('#importFile').addEventListener('change', e=>{
+  const file = e.target.files && e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data || !Array.isArray(data.members)) throw new Error('Structure du fichier invalide');
+      const ok = await confirmAction('Cette action <strong>remplacera toutes les données actuelles</strong> par le contenu du fichier.<br><br>Voulez-vous continuer ?');
+      if(!ok) return;
+      state.members = data.members.map(m=>({id:m.id||uid(),prenom:m.prenom||'',nom:m.nom||'',telephone:m.telephone||'',dateAdhesion:m.dateAdhesion||todayISO(),note:m.note||'',createdAt:m.createdAt||Date.now()}));
+      state.transactions = (Array.isArray(data.transactions)?data.transactions:[]).map(t=>({id:t.id||uid(),membreId:t.membreId,type:['cotisation','amende','retrait'].includes(t.type)?t.type:'cotisation',montant:Math.abs(Number(t.montant)||0),date:t.date||todayISO(),description:t.description||'',createdAt:t.createdAt||Date.now()})).filter(t=>state.members.some(m=>m.id===t.membreId));
+      state.schedules = (Array.isArray(data.schedules)?data.schedules:[]).map(s=>({id:s.id||uid(),membreId:s.membreId,date:s.date||todayISO(),heure:s.heure||'00:00',montant:Math.abs(Number(s.montant)||0),statut:s.statut==='effectue'?'effectue':'prevu',note:s.note||'',createdAt:s.createdAt||Date.now()})).filter(s=>state.members.some(m=>m.id===s.membreId));
+      state.history = Array.isArray(data.history)?data.history:[];
+      logHistory('restore',`Données restaurées (${state.members.length} membre(s), ${state.transactions.length} opération(s), ${state.schedules.length} programmation(s))`);
+      renderAll(); toast('Données restaurées avec succès');
+    }catch(err){ alert('Impossible de restaurer : '+err.message); }
+  };
+  reader.readAsText(file); e.target.value = '';
+});
+
+$('#resetBtn').addEventListener('click', async ()=>{
+  const ok = await confirmAction('⚠️ <strong>Toutes les données</strong> (membres, opérations, programmations et historique) seront définitivement supprimées.<br><br>Cette action est irréversible. Continuer ?');
+  if(!ok) return;
+  state = { members: [], transactions: [], history: [], schedules: [] };
+  logHistory('reset','Toutes les données ont été réinitialisées');
+  renderAll(); toast('Données réinitialisées');
+});
+
+/* ================= DÉMARRAGE ================= */
+initTheme();
+loadState();
+initFirebase();
+
+if(sessionStorage.getItem('ly_auth')==='1'){
+  showApp();
+}else{
+  setTimeout(()=>$('#accessKey')?.focus(),200);
+}
+</script>
+</body>
+</html>
